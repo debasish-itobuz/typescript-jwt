@@ -1,11 +1,11 @@
 import express, { Request, Response, NextFunction, Application, ErrorRequestHandler } from 'express'
 import bodyParser from 'body-parser';
+import { config } from 'dotenv'
+config()
 import todoRoutes from './routes/todoRoute'
 import userRoutes from './routes/userRoute'
 import connectToDb from './config/dbConnection';
-import { config } from 'dotenv'
 
-config()
 connectToDb()
 
 const app: Application = express()

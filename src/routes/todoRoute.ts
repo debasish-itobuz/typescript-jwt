@@ -6,7 +6,7 @@ const router = Router()
 
 router.use(verifyToken);
 
-router.post('/post', postTodo)
+router.post('/create', postTodo)
 router.get('/get', getTodo)
 router.get('/get-by-id', getTodoById)
 router.get('/get-by-filter', filterTodo)

@@ -8,6 +8,8 @@ const postUser = async (req: Request, res: Response) => {
     try {
         const user: User = req.body;
         userValidation.parse(user);
+        const alreadyExistUser = await userModel.findOne({email:user.email})
+        if(alreadyExistUser) return res.status(400).send({message: "User already exists"})
         const data = await userModel.create(user)
         return res.status(200).send({ data: data, meassage: "User added successfully" })
 
@@ -31,7 +33,7 @@ const loginUser = async (req: Request, res: Response) => {
                 "qwerty1234", //secret_key
                 { expiresIn: '10d' }
             )
-            console.log(token)
+            // console.log(token)
             return res.status(200).send({data:{token, email:data.email}, message:"User logged in successfully"})
         }
         else{

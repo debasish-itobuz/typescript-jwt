@@ -7,11 +7,11 @@ import { ZodError } from "zod";
 const postTodo = async (req: Request, res: Response) => {
     try {
         const todo: Todo = req.body;
-
+        console.log(todo)
         todoValidation.parse(todo);
-        const userId = req.CustomRequest.userId;
+        const userId = (req as CustomRequest).userId;
         // console.log(userId)
-        const data = await todoModel.create({todo, userId});
+        const data = await todoModel.create({...todo, userId});
         return res.status(200).send({ data: data, message: "Data added successfully" })
 
     } catch (e: any | ZodError) {
@@ -24,7 +24,7 @@ const postTodo = async (req: Request, res: Response) => {
 
 const getTodo = async (req: Request, res: Response) => {
     try {
-        const userId = req.CustomRequest.userId;
+        const userId = (req as CustomRequest).userId;
         const data: Todo[] = await todoModel.find({userId})
         return res.status(200).send({ data: data, message: "Data fetched successfully" })
     } catch (err) {
