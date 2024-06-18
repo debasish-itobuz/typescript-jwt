@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction, Application, ErrorRequestHandler } from 'express'
+import express, { Application, ErrorRequestHandler } from 'express'
 import bodyParser from 'body-parser';
 import { config } from 'dotenv'
 config()
@@ -10,6 +10,7 @@ connectToDb()
 
 const app: Application = express()
 const PORT: Number = Number(process.env.PORT) || 4005
+
 
 app.use(bodyParser.json());
 app.use(express.json())

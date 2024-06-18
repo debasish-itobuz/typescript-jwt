@@ -7,9 +7,7 @@ export interface CustomRequest extends Request {
 
 async function verifyToken(req: Request, res: Response, next: NextFunction) {
     try {
-        
-        // console.log(req.headers)
-        const authHeader = req.headers.authorization ;
+        const authHeader = req.headers.authorization;
 
         if (authHeader && authHeader.startsWith("Bearer")) {
             const token = authHeader.split(" ")[1];
@@ -17,7 +15,6 @@ async function verifyToken(req: Request, res: Response, next: NextFunction) {
             if (!token) {
                 throw new Error("Token is missing");
             }
-            
 
             jwt.verify(token, "qwerty1234", (err, decoded) => {
                 if (err) {
@@ -25,11 +22,9 @@ async function verifyToken(req: Request, res: Response, next: NextFunction) {
                 }
 
                 (req as CustomRequest).userId = (decoded as any).user.userId;
-                // console.log(decoded)
                 next();
             });
-        }
-        else{
+        } else {
             res.status(401).send("Token is missing");
         }
     } catch (err) {

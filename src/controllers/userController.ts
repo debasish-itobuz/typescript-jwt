@@ -1,7 +1,10 @@
 import userModel from '../models/userModel'
+import { config } from 'dotenv'
+config()
 import jwt from 'jsonwebtoken'
 import { Request, Response } from 'express'
 import { User, userValidation } from '../validators/userValidators'
+import { catchBlock } from '../helper/commonCode'
 import { ZodError } from 'zod'
 
 const postUser = async (req: Request, res: Response) => {
@@ -11,13 +14,10 @@ const postUser = async (req: Request, res: Response) => {
         const alreadyExistUser = await userModel.findOne({email:user.email})
         if(alreadyExistUser) return res.status(400).send({message: "User already exists"})
         const data = await userModel.create(user)
-        return res.status(200).send({ data: data, meassage: "User added successfully" })
+        return res.status(200).send({ data: data, message: "User added successfully" })
 
     } catch (e: any | ZodError) {
-        if (e instanceof ZodError) {
-            return res.status(400).send({ errors: e.issues, message: "User not added" })
-        }
-        return res.status(400).send({ message: e.message })
+        return catchBlock(e, res, "User not added")
     }
 }
 
@@ -26,14 +26,14 @@ const loginUser = async (req: Request, res: Response) => {
         const user: User = req.body;
         const { email, password } = user
         userValidation.parse(user);
-        const data = await userModel.findOne({ email })
+        const data = await userModel.findOne({ email });
+        if(!data) return res.status(400).send({ message:"User doesnot exists"})
         if (data && password === data.password) {
             const token = jwt.sign(
                 { user: { userId: data._id, email: data.email } },
-                "qwerty1234", //secret_key
+                `${process.env.SECRET_KEY}`,
                 { expiresIn: '10d' }
             )
-            // console.log(token)
             return res.status(200).send({data:{token, email:data.email}, message:"User logged in successfully"})
         }
         else{
@@ -41,10 +41,7 @@ const loginUser = async (req: Request, res: Response) => {
         }
 
     }  catch (e: any | ZodError) {
-        if (e instanceof ZodError) {
-            return res.status(400).send({ errors: e.issues, message: "User not loged in" })
-        }
-        return res.status(400).send({ message: e.message })
+        return catchBlock(e, res, "User not loged in")
     }
 }
 
