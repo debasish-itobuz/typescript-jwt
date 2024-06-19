@@ -1,4 +1,5 @@
 import userModel from '../models/userModel'
+import bcrypt  from "bcryptjs";
 import { config } from 'dotenv'
 config()
 import jwt from 'jsonwebtoken'
@@ -13,7 +14,10 @@ const postUser = async (req: Request, res: Response) => {
         userValidation.parse(user);
         const alreadyExistUser = await userModel.findOne({email:user.email})
         if(alreadyExistUser) return res.status(400).send({message: "User already exists"})
-        const data = await userModel.create(user)
+        
+        const salt = bcrypt.genSaltSync(10);
+        const hashedPassword = bcrypt.hashSync(user.password, salt);
+        const data = await userModel.create({...user, password:hashedPassword})
         return res.status(200).send({ data: data, message: "User added successfully" })
 
     } catch (e: any | ZodError) {
@@ -28,7 +32,9 @@ const loginUser = async (req: Request, res: Response) => {
         userValidation.parse(user);
         const data = await userModel.findOne({ email });
         if(!data) return res.status(400).send({ message:"User doesnot exists"})
-        if (data && password === data.password) {
+            
+        const isCorrectPassword = bcrypt.compareSync(password, data.password)
+        if (data && isCorrectPassword) {
             const token = jwt.sign(
                 { user: { userId: data._id, email: data.email } },
                 `${process.env.SECRET_KEY}`,
