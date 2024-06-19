@@ -16,7 +16,7 @@ async function verifyToken(req: Request, res: Response, next: NextFunction) {
                 throw new Error("Token is missing");
             }
 
-            jwt.verify(token, "qwerty1234", (err, decoded) => {
+            jwt.verify(token, `${process.env.SECRET_KEY}`, (err, decoded) => {
                 if (err) {
                     throw new Error("Wrong Token");
                 }

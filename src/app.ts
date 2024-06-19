@@ -2,11 +2,11 @@ import express, { Application, ErrorRequestHandler } from 'express'
 import bodyParser from 'body-parser';
 import { config } from 'dotenv'
 config()
+
 import todoRoutes from './routes/todoRoute'
 import userRoutes from './routes/userRoute'
 import connectToDb from './config/dbConnection';
-
-connectToDb()
+connectToDb() 
 
 const app: Application = express()
 const PORT: Number = Number(process.env.PORT) || 4005
